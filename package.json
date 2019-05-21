@@ -1,0 +1,40 @@
+{
+  "name": "fe-tests",
+  "version": "1.0.0",
+  "description": "fe tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "npm run build && sh deploy.sh",
+    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --validate --debug",
+    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm --validate --optimize",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
+    "start": "f2e start",
+    "build": "npm run asbuild:optimized && f2e build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fe-tests/fe-tests.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fe-tests/fe-tests/issues"
+  },
+  "homepage": "https://github.com/fe-tests/fe-tests#readme",
+  "devDependencies": {
+    "assemblyscript": "file:db/assemblyscript",
+    "f2e-middle-rollup": "^0.3.3",
+    "f2e-server": "^2.9.16",
+    "preact": "^8.4.2",
+    "rollup": "^1.12.3",
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-node-resolve": "^4.2.3",
+    "rollup-plugin-typescript2": "^0.21.1",
+    "typescript": "^3.4.5"
+  },
+  "dependencies": {
+    "ipreact": "^0.2.3"
+  }
+}
