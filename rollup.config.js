@@ -14,7 +14,7 @@ module.exports = [{
         intro: `const run_result = (function (raw) {
             const memory = new WebAssembly.Memory({ initial: 256, maximum: 256 });
             return async (answers) => {
-                const m = await WebAssembly.instantiate(new Uint8Array(Array(raw.length).fill(0).map((a,i) => raw.charCodeAt(i))), {
+                const m = await WebAssembly.instantiate(raw, {
                     env: {
                         abort: () => { throw new Error('overflow'); },
                         table: new WebAssembly.Table({ initial: 0, maximum: 0, element: 'anyfunc' }),
@@ -30,7 +30,7 @@ module.exports = [{
                 const rm = answers.map(a => a.reduce((m,n) => m + (1<<n),0))
                 return rm.map(m.instance.exports.getResult).map(r => !!r)
             }
-        })(atob("${wasm.toString('base64')}"));`,
+        })(new Uint8Array(${JSON.stringify([...wasm.values()])}));`,
         sourcemap: !build,
         file: 'bundle.js',
         format: 'iife'
