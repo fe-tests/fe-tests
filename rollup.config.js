@@ -12,25 +12,45 @@ module.exports = [{
     ],
     output: {
         intro: `const run_result = (function (raw) {
+            let exp;
             const memory = new WebAssembly.Memory({ initial: 256, maximum: 256 });
-            return async (answers) => {
-                const m = await WebAssembly.instantiate(raw, {
-                    env: {
-                        abort: () => { throw new Error('overflow'); },
-                        table: new WebAssembly.Table({ initial: 0, maximum: 0, element: 'anyfunc' }),
-                        __table_base: 0,
-                        memory: memory,
-                        __memory_base: 1024,
-                        __memory_allocate: () => {},
-                        __memory_free: () => {},
-                        STACKTOP: 0,
-                        STACK_MAX: memory.buffer.byteLength,
-                    }
-                })
-                const rm = answers.map(a => a.reduce((m,n) => m + (1<<n),0))
-                return rm.map(m.instance.exports.getResult).map(r => !!r)
+            WebAssembly.instantiate(raw, {
+                env: {
+                    abort: (e) => { console.log('abort', e); },
+                    table: new WebAssembly.Table({ initial: 0, maximum: 0, element: 'anyfunc' }),
+                    __table_base: 0,
+                    memory: memory,
+                    __memory_base: 1024,
+                    __memory_allocate: () => {},
+                    __memory_free: () => {},
+                    STACKTOP: 0,
+                    STACK_MAX: memory.buffer.byteLength,
+                }
+            }).then(m => exp = m.instance.exports);
+            async function waitUtil (fn) {
+                const res = fn();
+                if (undefined === res) {
+                    return new Promise(function r (resolve) {
+                        setTimeout(function () {
+                            let _res = fn();
+                            if (undefined === res) {
+                                r(resolve)
+                            } else {
+                                resolve(_res)
+                            }
+                        }, 100)
+                    })
+                } else {
+                    return res;
+                }
             }
-        })(new Uint8Array(${JSON.stringify([...wasm.values()])}));`,
+            return async (answers) => {
+                await waitUtil(() => !!exp);
+                answers.map(a => a.reduce((m,n) => m + (1<<n),0)).map(exp.setAnswer)
+                return exp.getResults()
+            }
+        })(new Uint8Array(atob("${wasm.toString('base64')}").split('').map(c => c.charCodeAt(0))));`,
+        // })(new Uint8Array(${JSON.stringify([...wasm.values()])}));`,
         sourcemap: !build,
         file: 'bundle.js',
         format: 'iife'

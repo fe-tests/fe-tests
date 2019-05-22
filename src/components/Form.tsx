@@ -2,7 +2,7 @@ import { h, Component } from "preact";
 import { Question } from "../interface";
 import questions from '../questions';
 import Item from './Item'
-declare var run_result: (answers: number[][]) => Promise<boolean[]>;
+declare var run_result: (answers: number[][]) => Promise<number>;
 
 const STORE_KEY = 'STORE_KEY_FOR_EXAM'
 let storeStr = localStorage.getItem(STORE_KEY)
@@ -36,7 +36,8 @@ export default class extends Component<{}, State> {
             alert(`你的得分为: ${this.state.results.filter(n => n).length * 100 / questions.length}`)
             return;
         }
-        run_result(store.answers).then((results) => {
+        run_result(store.answers).then((res) => {
+            const results = ('0'.repeat(25) + res.toString(2)).slice(-25).split('').map(c => c === '1').reverse()
             store.results = results
             this.setState({results})
         })
