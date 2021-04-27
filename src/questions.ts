@@ -41,9 +41,9 @@ const questions: Question[] = [
 		muti: true
 	},
 	{
-		question : "IE6中，以下CSS选择器被支持的有：",
-		radios : [ "span + p","ul > li",":after",".nav.current" ],
-		// desc: "多个class选择器在IE6里面可以识别第一个，可以看做能够被支持，但是请不要再IE6里面使用",
+		question : "以下那些css属性不可以被继承：",
+		radios : [ "line-height","font-size","color","background-color" ],
+		// desc: "作用域字体的属性一般都可以继承，作用域背景的属性不可继承",
 		muti: true
 	},
 	{

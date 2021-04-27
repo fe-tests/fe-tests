@@ -4,7 +4,7 @@ module.exports = {
     livereload: !build,
     build,
     gzip: true,
-    useLess: true,
+    useLess: false,
     buildFilter: p => !p || /^(sw|src(\/index)?|index)/.test(p),
     middlewares: [
         { middleware: 'rollup' },
