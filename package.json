@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "npm run build && sh deploy.sh",
+    "preinstall": "rm -rf output && git clone https://github.com/fe-tests/fe-tests.github.io output",
+    "deploy": "npm run build && cd output && git add . && git commit -m 'update' && git push",
     "start": "f2e start",
     "build": "f2e build"
   },
